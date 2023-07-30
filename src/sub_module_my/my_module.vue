@@ -1,14 +1,23 @@
-<script>
+<script setup>
 ///本文件是"我"的模块
-import {defineComponent} from 'vue'
+import  card  from "./my_business_card.vue";
+import  itemlist  from "./my_itemlist.vue";
 
-export default defineComponent({
-  name: "my_module"
-})
 </script>
 
 <template>
-  <p class="text-blue-500">this is my page</p>
+  <div class="mycard">
+    <card></card>
+    <div class="itemlistcotiner">
+      <itemlist></itemlist>
+    </div>
+ 
+  </div>
+
 </template>
 <style scoped>
+ .itemlistcotiner{
+  width: 80%;
+  margin-left: 10%;
+ }
 </style>
