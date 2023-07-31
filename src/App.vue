@@ -11,9 +11,8 @@ export default {
 }
 </script>
 <template>
-  <div class="flex flex-row justify-start items-center">
-    <total_side_bar class="h-screen w-56" style="background-color: #545c64 "></total_side_bar>
-    <router-view class="border-blue-600 h-screen w-full"></router-view>
+  <div class="h-screen">
+    <router-view></router-view>
   </div>
 </template>
 <style>
