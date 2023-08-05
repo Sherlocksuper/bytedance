@@ -3,7 +3,7 @@
 var titlelist = ['名称', '描述', '创建时间', '接口数量', '查看详情', '我的权限']
 
 var projects = [
-    { name: '项目1', description: '这是项目1的描述', createTime: '2023-07-30', apiCount: 10, details: '详情1', myPermission: '权限1' },
+    { name: '项目1', description: '这是项目1的描述', createTime: '2023-07-30', apiCount: 10, details: '详情1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', myPermission: '权限1' },
     { name: '项目2', description: '这是项目2的描述asjklhdashdlksahdlksahdlksahdklsahdksladdddddddddddddaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadddddddddddddddddd', createTime: '2023-07-31', apiCount: 15, details: '详情2', myPermission: '权限2' },
 
 ];
