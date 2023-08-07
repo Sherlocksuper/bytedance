@@ -3,10 +3,28 @@ export default {
   data() {
     return {
       showPart: 'Query',
-      bodyParams: {
+      baseInfo: {
         name: '',
-        region: '',
-        type: '',
+        func: 'POST',
+        methods: '',
+        resource: '',
+        desc: '',
+      },
+      bodyParams: {
+        bodyParamsType: 'JSON',
+        bodyFormParams: [
+          {
+            key: 1,
+            name: '',
+            type: '',
+            nec: 'necessary',
+            example: '',
+            desc: '',
+          },
+        ],
+        bodyJSONParams: "",
+        bodyFileParams: "{\"type\":\"object\",\"title\":\"empty object\",\"properties\":{}}",
+        bodyRAWParams: "{\"type\":\"object\",\"title\":\"empty object\",\"properties\":{}}",
       },
       queryParams: [
         {
@@ -26,26 +44,34 @@ export default {
           desc: '',
         },
       ],
-      baseInfo: {
-        name: '',
-        func: 'POST',
-        methods: '',
-        resource: '',
-        desc: '',
-      },
+      returnParams: {
+        returnType: 'JSON',
+        returnExample: '',
+        returnDesc: '',
+      }
     };
   },
   methods: {
+    removeBodyForm(item) {
+      const index = this.bodyParams.bodyFormParams.indexOf(item);
+      if (index !== -1) {
+        this.bodyParams.bodyFormParams.splice(index, 1);
+      }
+    },
+    addBodyForm() {
+      this.bodyParams.bodyFormParams.push({
+        key: Date.now(),
+        name: '',
+        type: '',
+        nec: 'necessary',
+        example: '',
+        desc: '',
+      });
+    },
     removeQuery(item) {
       const index = this.queryParams.indexOf(item);
       if (index !== -1) {
         this.queryParams.splice(index, 1);
-      }
-    },
-    removeHeader(item) {
-      const index = this.headerParams.indexOf(item);
-      if (index !== -1) {
-        this.headerParams.splice(index, 1);
       }
     },
     addQuery() {
@@ -63,6 +89,12 @@ export default {
         value: '',
         nec: ''
       });
+    },
+    removeHeader(item) {
+      const index = this.headerParams.indexOf(item);
+      if (index !== -1) {
+        this.headerParams.splice(index, 1);
+      }
     },
     submitForm(formEl) {
       if (!formEl) return;
@@ -125,21 +157,55 @@ export default {
           <el-radio-button label="Headers">Headers</el-radio-button>
         </el-radio-group>
         <el-form v-if="baseInfo.func !=='GET'" v-show="showPart === 'Body'" class="mt-10">
-          <el-form-item label="参数名称">
-            <el-input v-model="bodyParams.name" class="w-20"/>
-          </el-form-item>
-          <el-form-item label="参数类型">
-            <el-select v-model="bodyParams.region" placeholder="please select your zone">
-              <el-option label="String" value="String"/>
-              <el-option label="Number" value="Number"/>
-              <el-option label="Boolean" value="Boolean"/>
-              <el-option label="Array" value="Array"/>
-              <el-option label="Object" value="Object"/>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="参数描述">
-            <el-input v-model="bodyParams.type" type="textarea"/>
-          </el-form-item>
+          <el-radio-group v-model="bodyParams.bodyParamsType">
+            <el-radio-button label="Form">Form</el-radio-button>
+            <el-radio-button label="JSON">JSON</el-radio-button>
+            <el-radio-button label="File">File</el-radio-button>
+            <el-radio-button label="RAW">RAW</el-radio-button>
+          </el-radio-group>
+          <el-form v-show="bodyParams.bodyParamsType === 'Form'">
+            <el-form-item
+                v-for="(param, index) in bodyParams.bodyFormParams"
+                class="flex flex-row items-start justify-start mt-5"
+                :key="param.key"
+                :label="'Params' + (index+1)"
+                :prop="'domains.' + index + '.value'"
+                :rules="{required: true,message: 'domain can not be null',trigger: 'blur',}"
+            >
+              <el-form :inline="true" class="flex items-start justify-start">
+                <el-form-item label="参数名称">
+                  <el-input v-model="param.name" class="w-20"/>
+                </el-form-item>
+                <el-form-item label="是否必须">
+                  <el-select v-model="param.nec" placeholder="please select your zone">
+                    <el-option label="必须" value="necessary"/>
+                    <el-option label="非必须" value="unnecessary"/>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="示例">
+                  <el-input v-model="param.example" class="w-20"/>
+                </el-form-item>
+                <el-form-item label="描述">
+                  <el-input v-model="param.desc" class="w-20"/>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="danger" icon="el-icon-delete" @click="removeBodyForm(param)">删除</el-button>
+                </el-form-item>
+              </el-form>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" icon="el-icon-plus" @click="addBodyForm()">添加参数</el-button>
+            </el-form-item>
+          </el-form>
+          <el-form v-show="bodyParams.bodyParamsType ==='JSON'">
+            <el-input type="textarea" class="mt-10" v-model="bodyParams.bodyJSONParams"></el-input>
+          </el-form>
+          <el-form v-show="bodyParams.bodyParamsType === 'File'">
+            <el-input type="textarea" class="mt-10" v-model="bodyParams.bodyFileParams"></el-input>
+          </el-form>
+          <el-form v-show="bodyParams.bodyParamsType === 'RAW'">
+            <el-input type="textarea" class="mt-10" v-model="bodyParams.bodyRAWParams"></el-input>
+          </el-form>
         </el-form>
         <el-form v-show="showPart === 'Query'" class="mt-10"
                  label-width="120px"
@@ -217,16 +283,16 @@ export default {
       <h1 class="text-3xl font-bold">返回数据设置</h1>
       <form class="mt-5 ml-10">
         <el-form-item label="返回数据类型">
-          <el-select v-model="returnType" placeholder="please select your zone">
+          <el-select v-model="returnParams.returnType" placeholder="please select your zone">
             <el-option label="JSON" value="JSON"/>
-            <el-option label="XML" value="XML"/>
+            <el-option label="RAW" value="RAW"/>
           </el-select>
         </el-form-item>
         <el-form-item label="返回数据示例">
-          <el-input v-model="returnExample" type="textarea"/>
+          <el-input class v-model="returnParams.returnExample" type="textarea"/>
         </el-form-item>
         <el-form-item label="返回数据描述">
-          <el-input v-model="returnDesc" type="textarea"/>
+          <el-input v-model="returnParams.returnDesc" type="textarea"/>
         </el-form-item>
       </form>
     </div>
