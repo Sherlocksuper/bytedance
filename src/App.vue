@@ -1,5 +1,5 @@
 <script setup>
-import total_side_bar from './total_page/total_side_bar.vue'
+// import total_side_bar from './total_page/total_side_bar.vue'
 </script>
 <script>
 export default {
