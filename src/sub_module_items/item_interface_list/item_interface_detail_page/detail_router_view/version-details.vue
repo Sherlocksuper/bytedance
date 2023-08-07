@@ -1,10 +1,4 @@
-<!--
- * @Description: 
- * @Author: 遗憾
- * @Date: 2023-08-03 08:09:39
- * @LastEditTime: 2023-08-07 16:41:17
- * @LastEditors: 遗憾
--->
+
 <script setup>
 import { reactive, ref, toRefs, defineProps } from "vue";
 import { Calendar } from "@element-plus/icons-vue";

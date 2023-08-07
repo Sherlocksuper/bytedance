@@ -34,8 +34,16 @@ const accountRules = {
 
 const router = useRouter();
 // 3.执行帐号的登录逻辑
+const FormRef = ref(null);
 function loginRouter() {
-  router.push("/my");
+  FormRef.value.validate((valid) => {
+    if (!valid) {
+      return false;
+    }
+    //发送网络请求
+    console.log("验证通过");
+    router.push("/my");
+  });
 }
 
 // 4.注册路由跳转
@@ -65,7 +73,7 @@ export default defineComponent({
           :model="account"
           :rules="accountRules"
           status-icon
-          ref="fromRef"
+          ref="FormRef"
         >
           <el-form-item label="帐号" prop="name" class="middle-input">
             <el-input v-model="account.name" placeholder="请输入账户...">
