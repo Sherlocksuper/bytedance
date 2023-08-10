@@ -49,7 +49,10 @@ const form = reactive({ // 新建mock的表单数据
   name: '',
   triggerflag: true, // 触发条件列表伸展判断
   trigger_headerlist: [{ name: '', rule: '', value: '' }], // 触发条件请求头规则
-  trigger_bodylist: [{ name: '', rule: '', value: '' }], // 触发条件请求体规则
+  trigger_bodylist: [{ name: '', rule: '', value: '' }], // 触发条件请求体form-data规则
+  trigger_bodylist_xml: [{ name: '', rule: '', value: '' }], // 触发条件请求体xml规则
+  trigger_bodyrow: '', // 请求体row格式
+  trigger_querylist: [{ name: '', rule: '', value: '' }], // query参数列表
 })
 
 const onInputEvent_trigger_headerlist = (value) => { // input改动触发增加新参数检测
@@ -73,6 +76,29 @@ function deletrow_trigger_bodylist(index) { // 请求体删除该行
   console.log(index)
   form.trigger_bodylist.splice(index, 1)
 }
+
+const onInputEvent_trigger_bodylist_xml = (value) => { // 请求体xml input改动触发增加新参数检测
+  const endrow = form.trigger_bodylist_xml.length - 1
+  if (form.trigger_bodylist_xml[endrow].name != '' || form.trigger_bodylist_xml[endrow].value != '') {
+    form.trigger_bodylist_xml.push({ name: '', rule: '', value: '' })
+  }
+}
+function deletrow_trigger_bodylist_xml(index) { // 请求体删除该行
+  console.log(index)
+  form.trigger_bodylist_xml.splice(index, 1)
+}
+
+const onInputEvent_trigger_querylist = (value) => { // 请求体xml input改动触发增加新参数检测
+  const endrow = form.trigger_querylist.length - 1
+  if (form.trigger_querylist[endrow].name != '' || form.trigger_querylist[endrow].value != '') {
+    form.trigger_querylist.push({ name: '', rule: '', value: '' })
+  }
+}
+function deletrow_trigger_querylist(index) { // 请求体删除该行
+  console.log(index)
+  form.trigger_querylist.splice(index, 1)
+}
+
 
 
 </script>
@@ -121,6 +147,12 @@ function deletrow_trigger_bodylist(index) { // 请求体删除该行
       </div>
 
     </div>
+
+    <el-select v-model="triggerjson_select_value" class="m-2" placeholder="Select">
+      <el-option v-for="item_select in triggerjson_select_options" :key="item_select.value" :label="item_select.label"
+        :value="item_select.value" />
+    </el-select>
+    <!-- 添加MOCK弹窗 -->
 
     <el-dialog v-model="addmock_flag" title="添加 Mock API 期望" width="80%" align-center>
       <div class="line"></div>
@@ -192,20 +224,72 @@ function deletrow_trigger_bodylist(index) { // 请求体删除该行
                       </el-icon>
                     </div>
                   </el-tab-pane>
+
                   <!-- json类请求体 -->
-                  <el-tab-pane label="JSON" naem="JSON"> 
-                    <el-select v-model="triggerjson_select_value" class="m-2" placeholder="Select">
-                      <el-option v-for="item_select in triggerjson_select_options" :key="item_select.value" :label="item_select.label" :value="items_select.value" />
+                  <el-tab-pane label="JSON" name="JSON">
+
+                    <el-select v-model="triggerjson_select_value" class="m-2" placeholder="Select"
+                      :popper-append-to-body="false">
+                      <el-option v-for="item_select in triggerjson_select_options" :key="item_select.value"
+                        :label="item_select.label" :value="item_select.value" />
                     </el-select>
                   </el-tab-pane>
-                  <el-tab-pane label="XML" naem="XML">Role</el-tab-pane>
-                  <el-tab-pane label="Raw" name="Raw">Task</el-tab-pane>
+
+                  <el-tab-pane label="XML" name="XML">
+
+                    <!-- 表头 -->
+                    <div class="list-title">
+                      <div style="width: 30%; padding-left: 0;">xPath</div>
+                      <div style="width: 30%;">| 内容校验</div>
+                      <div style="width: 30%;">| 预期结果</div>
+                    </div>
+                    <!-- 表格 -->
+                    <div v-for="(item, index) in form.trigger_bodylist_xml" :key="index">
+                      <el-input v-model="item.name" placeholder="参数名" class="trigger-headerlist-input-name"
+                        @input="onInputEvent_trigger_bodylist_xml" />
+                      <!-- 内容校验选项 -->
+                      <el-select v-model="triggerjson_select_value" class="m-2" placeholder="Select"
+                        :popper-append-to-body="false">
+                        <el-option v-for="item_select in triggerjson_select_options" :key="item_select.value"
+                          :label="item_select.label" :value="item_select.value" />
+                      </el-select>
+                      <el-input v-model="item.value" placeholder="参数值" class="trigger-headerlist-input"
+                        @input="onInputEvent_trigger_bodylist_xml" />
+                      <el-icon style="margin-left: 15px; cursor: pointer;" @click="deletrow_trigger_bodylist_xml(index)"
+                        size="20">
+                        <Delete style="padding-top: 7px;" />
+                      </el-icon>
+                    </div>
+                  </el-tab-pane>
+                  <el-tab-pane label="Raw" name="Raw">
+                    <el-input v-model="form.trigger_bodyrow" :rows="2" type="textarea" placeholder="Please input"
+                      :autosize="{ minRows: 7, maxRows: 10 }" />
+                  </el-tab-pane>
                 </el-tabs>
               </el-tab-pane>
 
 
               <!-- Query参数选项页 -->
-              <el-tab-pane label="Query参数" name="Query参数">Role</el-tab-pane>
+              <el-tab-pane label="Query参数" name="Query参数">
+                <!-- 表头 -->
+                <div class="list-title">
+                  <div style="width: 30%; padding-left: 0;">参数名</div>
+                  <div style="width: 30%;">| 判断规则</div>
+                  <div style="width: 30%;">| 参数值</div>
+                </div>
+                <!-- 表格 -->
+                <div v-for="(item, index) in form.trigger_querylist" :key="index">
+                  <el-input v-model="item.name" placeholder="参数名" class="trigger-headerlist-input-name"
+                    @input="onInputEvent_trigger_querylist" />
+                  <el-input v-model="item.rule" disabled placeholder="=" class="trigger-headerlist-input" />
+                  <el-input v-model="item.value" placeholder="参数值" class="trigger-headerlist-input"
+                    @input="onInputEvent_trigger_querylist" />
+                  <el-icon style="margin-left: 15px; cursor: pointer;" @click="deletrow_trigger_querylist(index)"
+                    size="20">
+                    <Delete style="padding-top: 7px;" />
+                  </el-icon>
+                </div>
+              </el-tab-pane>
 
             </el-tabs>
           </el-collapse-item>
@@ -306,6 +390,8 @@ function deletrow_trigger_bodylist(index) { // 请求体删除该行
   }
 
   .el-dialog {
+    z-index: 100;
+
 
     // 弹窗
     .mock-name {
@@ -371,6 +457,16 @@ function deletrow_trigger_bodylist(index) { // 请求体删除该行
       }
 
       .request-body {
+
+
+        .m-2 {}
+
+
+        :deep(.el-select-dropdown) {
+          z-index: 9999999;
+
+        }
+
         :deep(.el-tabs__content) {
           padding-top: 0;
         }
@@ -394,6 +490,11 @@ function deletrow_trigger_bodylist(index) { // 请求体删除该行
 
 
 
+
+}
+
+:deep(.el-select-dropdown) {
+  z-index: 9999999 !important;
 
 }
 </style>
